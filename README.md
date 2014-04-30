@@ -14,7 +14,7 @@ To run this server:
 
 To view the server in action:
 
-  * Visit http://frozen-plains-7894.herokuapp.com/
+  * Visit http://oscillator-art.herokuapp.com/
 
 ## Links
 
