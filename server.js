@@ -1,4 +1,5 @@
 var express = require('express');
+var favicon = require('static-favicon');
 var expressHandlebars = require('express3-handlebars');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -12,6 +13,7 @@ var app = express();
 var handlebars = require('./helpers/create_handlebars');
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
+app.use(favicon(__dirname + '/public/images/favicon.ico'));
 
 app.use(bodyParser());
 app.use(cookieParser());
