@@ -41,6 +41,10 @@ app.get('/', function(req, res){
   res.render('index');
 });
 
+app.get('/gallery', function(req, res){
+  res.render('gallery');
+});
+
 app.get('/sine', function(req, res){
   res.render('sine');
 });

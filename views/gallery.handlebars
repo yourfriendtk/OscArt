@@ -1,0 +1,94 @@
+<script language="javascript" type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/p5.js/0.2.8/p5.min.js"></script>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+
+<h1>Oscillator Art</h1>
+
+<script type="text/javascript">
+// parse initialization
+Parse.initialize("eWPNe3TUXgWFSwB0K7RBT5K6JoGZCNQezY65xWEh", "D5282Li25JM10WBARFrT5uPMxxPFtL6mwGM2zU1v");
+
+var imgSizeX = window.innerWidth;
+var imgSizeY = 375; //or imgSizeX*0.2;
+var imgFirstMargin = 155;
+var imgMargin = 50;
+
+var imgDiv = [];
+
+// create the parse class
+var FreqObj = Parse.Object.extend("Freqs");
+var SavedFreqObj = Parse.Object.extend("SavedFreqs");
+
+function saveFreqs(f1, f2) {
+    var query = new Parse.Query(SavedFreqObj);
+	query.get("6IhpnPnyIB", {
+	  success: function(query) {
+	    query.set("freq1", f1);
+    	query.set("freq2", f2);
+    	query.save();
+	  },
+	  error: function(object, error) {
+	    // The object was not retrieved successfully.
+	    // error is a Parse.Error with an error code and description.
+	  }
+	});
+ };
+
+function loadFreqs() {
+  var query = new Parse.Query(FreqObj);
+  query.exists("freq1");
+  query.descending("createdAt");
+  query.find({
+    success: function(results) {
+      for (var i = 0; i < results.length; i++) { 
+        var object = results[i];
+        //console.log(object.get("freq1") + " & " + object.get("freq2"));
+        //imgDiv[i] = createHTMLImage("/public/images/OscillatorArt_01.png");
+        imgDiv[i] = createHTML("<div><a href='/sine'>" +
+        	object.get("freq1") + " / " + object.get("freq2")
+        	+ "</a></div>");
+        imgDiv[i].position(0, imgFirstMargin+ imgSizeY*i + imgMargin*i);
+        imgDiv[i].style('width:' +imgSizeX+ 'px; height:' +imgSizeY+ 'px; padding:20px');
+        if (i%2 == 0) imgDiv[i].style('background-color: #EEE;');
+        else imgDiv[i].style('background-color: #CCC;');
+        imgDiv[i].id("imgDiv");
+        
+        imgDiv[i].freq1 = object.get("freq1");
+        imgDiv[i].freq2 = object.get("freq2");
+      }
+    },
+    error: function(error) {
+      alert("Error: " + error.code + " " + error.message);
+    }
+  });
+};
+
+function cccc() {
+	console.log("YES");
+	//imgDiv[i].style('background-color: #00F;');
+}
+function setup() {
+	loadFreqs();
+	var canvas = createCanvas(0, 0);
+};
+
+
+function draw() {
+	clear();
+};
+
+function mousePressed() {
+	for (var i=0; i<imgDiv.length; i++){
+		if (mouseY > imgSizeY*i + imgMargin*i
+		&& mouseY < imgSizeY*(i+1) + imgMargin*i ){
+			//var top = imgSizeY*i + imgMargin*i;
+			//var bottom = imgSizeY*(i+1) + imgMargin*i;
+			saveFreqs(imgDiv[i].freq1, imgDiv[i].freq2);
+			//console.log(top + "  /  " +bottom + " : " +mouseY);
+			console.log("SAVED INTO SINE GEN || " + "Freq1: " +imgDiv[i].freq1+ "  &  Freq2: " +imgDiv[i].freq2);
+		}
+	}
+};
+
+</script>
