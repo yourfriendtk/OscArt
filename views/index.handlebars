@@ -3,13 +3,33 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
 
-<h1>Oscillator Art</h1>
+<h1>~ Interactive Waveform Generators ~</h1>
+<br>
+<!-- <p style="color: #999"><i></i></p> -->
 
+<script type="text/javascript">
+	
+	var oscArt;
 
-<div class='row'>
+	function setup() {
+		cnv = createCanvas(window.innerWidth, 375);
+		oscArt = loadImage("../public/images/OscillatorArt_01.png");
+		// image(oscArt, 0, 0, window.innerWidth, 375);
+	}
+
+	function draw() {
+		cnv.style('width:'+window.innerWidth+'px; height: AUTO;');
+		image(oscArt, 0, 0, window.innerWidth, 375);
+	}
+
+</script>
+
+<!-- <div class='row'>
 	<div class='col-md-8'>
 		<p style="color: #999"><i></i></p>
+
+	</div>
 	<div>
-	<center><img src='/public/images/BasicWaveForms.png'/></center>
+		<img src='/public/images/OscillatorArt_01.png' style="width:100%" />
 	</div>	
-</div>
+</div> -->

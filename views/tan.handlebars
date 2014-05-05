@@ -3,7 +3,7 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
 
-  <h1>Square</h1>
+  <h1>Tan</h1>
   <p style="color: #999"><i>|| Up + Down || Left + Right || Space + Esc ||</i></p>
 
 <script type="text/javascript">
@@ -14,6 +14,7 @@ Parse.initialize("eWPNe3TUXgWFSwB0K7RBT5K6JoGZCNQezY65xWEh", "D5282Li25JM10WBARF
 // create the parse class
 var FreqObj = Parse.Object.extend("Freqs");
 var SavedFreqObj = Parse.Object.extend("SavedFreqs");
+
 // declare global variables
 var angle = 0;
 var angleVel = 0.1;
@@ -23,13 +24,10 @@ var angle2 = 0;
 var angleVel2 = 0.1;
 var freq2;
 
-var randThresh = 30;
-var randThresh2 = 30;
+var randThresh = 100;
 var offset = 200;
 
 var c = 255;
-
-var a;
 
 var WAVE_HEIGHT = 375;
 var BUTTON_DIV = 150
@@ -40,6 +38,7 @@ var cnv;
 
 var saveButton;
 
+// initialize the freq values based on gallery selection
 function LoadSavedFreqs() {
   var query = new Parse.Query(SavedFreqObj);
   query.get("6IhpnPnyIB", {
@@ -59,11 +58,13 @@ function LoadSavedFreqs() {
 function setup() {
   cnv = createCanvas(window.innerWidth, WAVE_HEIGHT + BUTTON_DIV);
   freq1 = random(randThresh);
-  freq2 = random(randThresh2);
+  freq2 = random(randThresh);
 
   background(c);
   strokeWeight(2);
   noFill();
+  smooth();
+
   saveButton = loadImage("../public/images/saveButton.jpg");
   LoadSavedFreqs();
   console.log("Loaded in 'function setup()': " + freq1 + " & " + freq2);
@@ -72,42 +73,38 @@ function setup() {
 function draw() {
   cnv.style('width:'+window.innerWidth+'px; height: AUTO;');
     wave();
-
     button();
 }
 
-function square(t)
-{
-  // a /= TWO_PI;
-  // a -= round(a);
-  return t%TWO_PI >= PI ? 1 : -1
-}
 
 function wave() {
     stroke(0);
     beginShape();
-    for (var x = 0; x <= width + offset; x += freq1/2) {
-      var y = map(square(angle), -1, 1, 0, WAVE_HEIGHT);
-      vertex(x, y);
-      vertex(x + freq1/2, y);
+    for (var x = 0; x <= width + offset; x += freq1) {
+      var y = map(tan(angle), -3, 3, 0, WAVE_HEIGHT);
+      var yCrop = constrain(y, 0, WAVE_HEIGHT);
+      vertex(x, yCrop);
       angle += angleVel;
     } 
     endShape();
 
-    // console.log("x: " + x + " & Y: " + y);
-
     stroke(255);
     beginShape();
-    for (var x = 0; x <= width + offset; x += freq2/2) {
-      var y = map(square(angle2), -1, 1, 0, WAVE_HEIGHT);
-      vertex(x, y);
-      vertex(x + freq2/2, y);
+    for (var x = 0; x <= width + offset; x += freq2) {
+      var y = map(tan(angle2), -3, 3, 0, WAVE_HEIGHT);
+      var yCrop = constrain(y, 0, WAVE_HEIGHT);
+      vertex(x, yCrop);
       angle2 += angleVel2;
     } 
     endShape();
+
+    stroke(255);
+    rect(0, 0, window.innerWidth, WAVE_HEIGHT);
 }
 
 function button() {
+  // stroke(0);
+  // ellipse(width/2, WAVE_HEIGHT + 50, BUTTON_SIZE_X, BUTTON_SIZE_Y);
   image(saveButton, width/2 - 51, WAVE_HEIGHT + 20);
 }
 
@@ -125,31 +122,31 @@ function mousePressed() {
   if ( mouseY < WAVE_HEIGHT && mouseY > 0) {
     background(c);
     freq1 = random(randThresh);
-    freq2 = random(randThresh2);
+    freq2 = random(randThresh);
   }
 }
 
 document.body.onkeydown=function(e){
-  if(e.keyCode == 38 && freq1 < randThresh) { 
+  if(e.keyCode == 38 && freq1 < 100) { 
       // background(c);
-        freq1+=.1;
+        freq1+=1;
     }
     if(e.keyCode == 40 && freq1 > 1) { 
     // background(c);
-        freq1-=.1; 
+        freq1-=1; 
     }
-    if(e.keyCode == 39 && freq2 < randThresh2) { 
+    if(e.keyCode == 39 && freq2 < 100) { 
         // background(c);
-        freq2+=.1; 
+        freq2+=1; 
     }
-    if(e.keyCode == 37 && freq2 > .5) { 
+    if(e.keyCode == 37 && freq2 > 1) { 
         // background(c);
-        freq2-=.1; 
+        freq2-=1; 
     }
     if(e.keyCode == 32) { 
         background(c);
         freq1 = random(randThresh);
-        freq2 = random(randThresh2);
+        freq2 = random(randThresh);
     }
     if(e.keyCode == 27) { 
         background(c);
@@ -159,7 +156,7 @@ document.body.onkeydown=function(e){
       
     console.log(e.keyCode);      
     console.log(freq1 + " " + freq2);
-}     
+}    
 
 function saveFreqs() {
     var freqObj = new FreqObj();

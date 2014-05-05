@@ -1,2 +1,214 @@
-<h1>Triangle</h1>
-<p style="color: #999"><i>|| Up + Down || Left + Right || Click ||</i></p>
+<script language="javascript" type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/p5.js/0.2.8/p5.min.js"></script>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+
+  <h1>Triangle</h1>
+  <p style="color: #999"><i>|| Up + Down || Left + Right || Space + Esc ||</i></p>
+
+<script type="text/javascript">
+
+// parse initialization
+Parse.initialize("eWPNe3TUXgWFSwB0K7RBT5K6JoGZCNQezY65xWEh", "D5282Li25JM10WBARFrT5uPMxxPFtL6mwGM2zU1v");
+
+// create the parse class
+var FreqObj = Parse.Object.extend("Freqs");
+var SavedFreqObj = Parse.Object.extend("SavedFreqs");
+
+// declare global variables
+var y;
+
+var angle = 0;
+var angleVel = 0.1;
+var freq1;
+
+var angle2 = 0;
+var angleVel2 = 0.1;
+var freq2;
+
+var randThresh = 100;
+var offset = 200;
+
+var c = 255;
+
+var WAVE_HEIGHT = 375;
+var BUTTON_DIV = 150
+var BUTTON_SIZE_X = 102;
+var BUTTON_SIZE_Y = 112;
+
+var cnv;
+
+var saveButton;
+
+// initialize the freq values based on gallery selection
+function LoadSavedFreqs() {
+  var query = new Parse.Query(SavedFreqObj);
+  query.get("6IhpnPnyIB", {
+    success: function(query) {
+      freq1 = query.get("freq1");
+      freq2 = query.get("freq2");
+      console.log("Loaded in 'function LoadSavedFreqs()': " + freq1+ "  /  " +freq2);
+    },
+    error: function(object, error) {
+      // The object was not retrieved successfully.
+      // error is a Parse.Error with an error code and description.
+    }
+  });
+};
+
+
+function setup() {
+  cnv = createCanvas(window.innerWidth, WAVE_HEIGHT + BUTTON_DIV);
+  freq1 = random(randThresh);
+  freq2 = random(randThresh);
+
+  background(c);
+  strokeWeight(2);
+  noFill();
+  saveButton = loadImage("../public/images/saveButton.jpg");
+  LoadSavedFreqs();
+  console.log("Loaded in 'function setup()': " + freq1 + " & " + freq2);
+}
+
+function draw() {
+  cnv.style('width:'+window.innerWidth+'px; height: AUTO;');
+    wave();
+    button();
+}
+
+// function sawtooth(a)
+// { 
+//   a /= TWO_PI;
+//   a -= round(a);
+//   return map(a, 0, 1, -1, 1);
+// }
+
+// function sqw(a)
+// {
+//   a /= TWO_PI;
+//   a -= int(a);
+//   return a < .5? -1 : 1;
+// }
+
+function triangle(a) {
+	if (a < WAVE_HEIGHT) {
+		a+=freq1
+	} else {
+		a-=freq1
+	}
+
+}
+
+function wave() {
+    stroke(0);
+    beginShape();
+    for (var x = 0; x <= width + offset; x += freq1) {
+      if (var y < WAVE_HEIGHT) { y += freq1; }
+      else { y -=freq1; }
+      vertex(x, y);
+      angle += angleVel;
+    } 
+    endShape();
+
+    stroke(255);
+    beginShape();
+    for (var x = 0; x <= width + offset; x += freq2) {
+      if (var y < WAVE_HEIGHT) { y += freq2; }
+      else { y -=freq2; }
+      vertex(x, y);
+      angle2 += angleVel2;
+    } 
+    endShape();
+
+}
+
+function button() {
+  // stroke(0);
+  // ellipse(width/2, WAVE_HEIGHT + 50, BUTTON_SIZE_X, BUTTON_SIZE_Y);
+  image(saveButton, width/2 - 51, WAVE_HEIGHT + 20);
+}
+
+function mouseReleased() {
+  if (mouseX > width/2-BUTTON_SIZE_X/2 && mouseX < width/2+BUTTON_SIZE_X/2) {
+    if (mouseY > WAVE_HEIGHT+50-BUTTON_SIZE_Y/2 && mouseY < WAVE_HEIGHT+50+BUTTON_SIZE_Y/2) {
+        saveFreqs();
+        loadFreqs();
+        console.log("Freqs saved: " +freq1+ " & " +freq2);
+    }
+  }
+}
+
+function mousePressed() {
+  if ( mouseY < WAVE_HEIGHT && mouseY > 0) {
+    background(c);
+    freq1 = random(randThresh);
+    freq2 = random(randThresh);
+  }
+}
+
+document.body.onkeydown=function(e){
+  if(e.keyCode == 38 && freq1 < 100) { 
+      // background(c);
+        freq1+=1;
+    }
+    if(e.keyCode == 40 && freq1 > 1) { 
+    // background(c);
+        freq1-=1; 
+    }
+    if(e.keyCode == 39 && freq2 < 100) { 
+        // background(c);
+        freq2+=1; 
+    }
+    if(e.keyCode == 37 && freq2 > 1) { 
+        // background(c);
+        freq2-=1; 
+    }
+    if(e.keyCode == 32) { 
+        background(c);
+        freq1 = random(randThresh);
+        freq2 = random(randThresh);
+    }
+    if(e.keyCode == 27) { 
+        background(c);
+        freq1 = random(.1, 1);
+        freq2 = random(.1, 1);
+    }
+      
+    console.log(e.keyCode);      
+    console.log(freq1 + " " + freq2);
+}  
+
+function saveFreqs() {
+    var freqObj = new FreqObj();
+
+    freqObj.set("freq1", freq1);
+    freqObj.set("freq2", freq2);
+     
+    freqObj.save(null, {
+      success: function(freqObj) {
+      },
+      error: function(freqObj, error) {
+      }
+    });
+  }
+
+function loadFreqs() {
+  var query = new Parse.Query(FreqObj);
+  query.exists("freq1");
+  query.find({
+    success: function(results) {
+      for (var i = 0; i < results.length; i++) { 
+        var object = results[i];
+        console.log(object.get("freq1") + " & " + object.get("freq2"));
+      }
+    },
+    error: function(error) {
+      alert("Error: " + error.code + " " + error.message);
+    }
+  });
+}
+  
+</script>
+
+
+

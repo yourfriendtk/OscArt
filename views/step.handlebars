@@ -16,15 +16,15 @@ var FreqObj = Parse.Object.extend("Freqs");
 var SavedFreqObj = Parse.Object.extend("SavedFreqs");
 // declare global variables
 var angle = 0;
-var angleVel = 0.1;
+var angleVel = .1;
 var freq1;
 
 var angle2 = 0;
-var angleVel2 = 0.1;
+var angleVel2 = .1;
 var freq2;
 
-var randThresh = 30;
-var randThresh2 = 30;
+var randThresh = 100;
+var randThresh2 = 100;
 var offset = 200;
 
 var c = 255;
@@ -58,8 +58,8 @@ function LoadSavedFreqs() {
 
 function setup() {
   cnv = createCanvas(window.innerWidth, WAVE_HEIGHT + BUTTON_DIV);
-  freq1 = random(randThresh);
-  freq2 = random(randThresh2);
+  freq1 = round(random(randThresh));
+  freq2 = round(random(randThresh2));
 
   background(c);
   strokeWeight(2);
@@ -86,10 +86,10 @@ function square(t)
 function wave() {
     stroke(0);
     beginShape();
-    for (var x = 0; x <= width + offset; x += freq1/2) {
-      var y = map(square(angle), -1, 1, 0, WAVE_HEIGHT);
+    for (var x = 0; x <= width + offset; x += freq1) {
+      var y = map(sin(angle), -1, 1, 0, WAVE_HEIGHT);
       vertex(x, y);
-      vertex(x + freq1/2, y);
+      vertex(x + freq1, y);
       angle += angleVel;
     } 
     endShape();
@@ -98,10 +98,10 @@ function wave() {
 
     stroke(255);
     beginShape();
-    for (var x = 0; x <= width + offset; x += freq2/2) {
-      var y = map(square(angle2), -1, 1, 0, WAVE_HEIGHT);
+    for (var x = 0; x <= width + offset; x += freq2) {
+      var y = map(sin(angle2), -1, 1, 0, WAVE_HEIGHT);
       vertex(x, y);
-      vertex(x + freq2/2, y);
+      vertex(x + freq2, y);
       angle2 += angleVel2;
     } 
     endShape();
@@ -124,32 +124,32 @@ function mouseReleased() {
 function mousePressed() {
   if ( mouseY < WAVE_HEIGHT && mouseY > 0) {
     background(c);
-    freq1 = random(randThresh);
-    freq2 = random(randThresh2);
+    freq1 = round(random(randThresh));
+    freq2 = round(random(randThresh2));
   }
 }
 
 document.body.onkeydown=function(e){
   if(e.keyCode == 38 && freq1 < randThresh) { 
       // background(c);
-        freq1+=.1;
+        freq1+=1;
     }
     if(e.keyCode == 40 && freq1 > 1) { 
     // background(c);
-        freq1-=.1; 
+        freq1-=1; 
     }
     if(e.keyCode == 39 && freq2 < randThresh2) { 
         // background(c);
-        freq2+=.1; 
+        freq2+=1; 
     }
-    if(e.keyCode == 37 && freq2 > .5) { 
+    if(e.keyCode == 37 && freq2 > 1) { 
         // background(c);
-        freq2-=.1; 
+        freq2-=1; 
     }
     if(e.keyCode == 32) { 
         background(c);
-        freq1 = random(randThresh);
-        freq2 = random(randThresh2);
+        freq1 = round(random(randThresh));
+        freq2 = round(random(randThresh2));
     }
     if(e.keyCode == 27) { 
         background(c);

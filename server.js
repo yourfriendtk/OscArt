@@ -61,6 +61,18 @@ app.get('/sawtooth', function(req, res){
   res.render('sawtooth');
 });
 
+app.get('/step', function(req, res){
+  res.render('step');
+});
+
+// app.get('/sawStep', function(req, res){
+//   res.render('sawStep');
+// });
+
+app.get('/tan', function(req, res){
+  res.render('tan');
+});
+
 // var studentRoutes = require('./routes/students');
 // app.get('/students', studentRoutes.get);
 
