@@ -61,7 +61,7 @@ function setup() {
   freq2 = random(randThresh);
 
   background(c);
-  strokeWeight(2);
+  strokeWeight(3);
   noFill();
   smooth();
 
@@ -131,7 +131,7 @@ document.body.onkeydown=function(e){
       // background(c);
         freq1+=1;
     }
-    if(e.keyCode == 40 && freq1 > 1) { 
+    if(e.keyCode == 40 && freq1 > 1.5) { 
     // background(c);
         freq1-=1; 
     }
@@ -139,7 +139,7 @@ document.body.onkeydown=function(e){
         // background(c);
         freq2+=1; 
     }
-    if(e.keyCode == 37 && freq2 > 1) { 
+    if(e.keyCode == 37 && freq2 > 1.5) { 
         // background(c);
         freq2-=1; 
     }
@@ -150,8 +150,8 @@ document.body.onkeydown=function(e){
     }
     if(e.keyCode == 27) { 
         background(c);
-        freq1 = random(.1, 1);
-        freq2 = random(.1, 1);
+        freq1 = random(.5, 2);
+        freq2 = random(.5, 2);
     }
       
     console.log(e.keyCode);      
