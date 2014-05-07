@@ -8,14 +8,57 @@
 
 <script type="text/javascript">
 
+// **************************** //
+// ****** WEB AUDIO INIT ****** //
+// **************************** //
+/*
+var context = new webkitAudioContext();
+
+var oscillator1 = context.createOscillator(); 
+var oscillator2 = context.createOscillator(); 
+var gainNode1 = context.createGainNode(); 
+var gainNode2 = context.createGainNode(); 
+var masterGain = context.createGainNode(); 
+
+var lowThresh = 20; 
+var highThresh = 220;
+ 
+oscillator1.type = 0;
+oscillator1.frequency.value = 0; 
+oscillator1.connect(gainNode1); 
+gainNode1.connect(masterGain); 
+masterGain.connect(context.destination); 
+gainNode1.gain.value = 0.1; 
+oscillator1.noteOn(0);  
+        
+oscillator2.type = 0; 
+oscillator2.frequency.value = 0; 
+gainNode1.connect(masterGain); 
+masterGain.connect(context.destination); 
+gainNode2.connect(context.destination); 
+gainNode2.gain.value = 0.1; 
+oscillator2.noteOn(0);
+
+masterGain.gain.value = 0.1; 
+*/
+
+// ************************ //
+// ****** PARSE INIT ****** //
+// ************************ //
+
 // parse initialization
 Parse.initialize("eWPNe3TUXgWFSwB0K7RBT5K6JoGZCNQezY65xWEh", "D5282Li25JM10WBARFrT5uPMxxPFtL6mwGM2zU1v");
 
 // create the parse class
-var FreqObj = Parse.Object.extend("Freqs");
+var FreqObj = Parse.Object.extend("OscArt");
 var SavedFreqObj = Parse.Object.extend("SavedFreqs");
 
-// declare global variables
+
+// ********************* //
+// ****** P5 INIT ****** //
+// ********************* //
+
+// declare global variables for the P5 sketch
 var angle = 0;
 var angleVel = 0.1;
 var freq1;
@@ -35,8 +78,13 @@ var BUTTON_SIZE_X = 102;
 var BUTTON_SIZE_Y = 112;
 
 var cnv;
-
+var imgCap;
 var saveButton;
+
+
+// ************************************** //
+// ****** LOAD FROM PARSE DATABASE ****** //
+// ************************************** //
 
 // initialize the freq values based on gallery selection
 function LoadSavedFreqs() {
@@ -45,7 +93,7 @@ function LoadSavedFreqs() {
     success: function(query) {
       freq1 = query.get("freq1");
       freq2 = query.get("freq2");
-      console.log("Loaded in 'function LoadSavedFreqs()': " + freq1+ "  /  " +freq2);
+      // console.log("Loaded in 'function LoadSavedFreqs()': " +freq1+ "  /  " +freq2);
     },
     error: function(object, error) {
       // The object was not retrieved successfully.
@@ -55,17 +103,26 @@ function LoadSavedFreqs() {
 };
 
 
+// *********************** //
+// ****** P5 SKETCH ****** //
+// *********************** //
+
 function setup() {
   cnv = createCanvas(window.innerWidth, WAVE_HEIGHT + BUTTON_DIV);
   freq1 = random(randThresh);
   freq2 = random(randThresh);
+
+  var imgCap  = cnv.elt.toDataURL("image/png");
+
+  // oscillator1.frequency.value = map(freq1, 0, 100, lowThresh, highThresh); 
+  // oscillator2.frequency.value = map(freq2, 0, 100, lowThresh, highThresh); 
 
   background(c);
   strokeWeight(3);
   noFill();
   saveButton = loadImage("../public/images/saveButton.jpg");
   LoadSavedFreqs();
-  console.log("Loaded in 'function setup()': " + freq1 + " & " + freq2);
+  // console.log("Loaded in 'function setup()': " + freq1 + " & " + freq2);
 }
 
 function draw() {
@@ -73,7 +130,6 @@ function draw() {
     wave();
     button();
 }
-
 
 function wave() {
     stroke(0);
@@ -93,7 +149,6 @@ function wave() {
       angle2 += angleVel2;
     } 
     endShape();
-
 }
 
 function button() {
@@ -105,20 +160,27 @@ function button() {
 function mouseReleased() {
   if (mouseX > width/2-BUTTON_SIZE_X/2 && mouseX < width/2+BUTTON_SIZE_X/2) {
     if (mouseY > WAVE_HEIGHT+50-BUTTON_SIZE_Y/2 && mouseY < WAVE_HEIGHT+50+BUTTON_SIZE_Y/2) {
+        var imgCap  = cnv.elt.toDataURL("image/png");
         saveFreqs();
         loadFreqs();
-        console.log("Freqs saved: " +freq1+ " & " +freq2);
+        console.log("Freqs saved: " +freq1+ " / " +freq2+ " & Image saved: " +imgCap);
+
+        // var imgDisplay = createHTML('<img src="'+imgCap+'" width="window.innerWidth"/> ');
     }
   }
 }
 
 function mousePressed() {
-  if ( mouseY < WAVE_HEIGHT && mouseY > 0) {
-    background(c);
-    freq1 = random(randThresh);
-    freq2 = random(randThresh);
+  // var imgCap  = cnv.elt.toDataURL("image/png");
+
+  // if ( mouseY < WAVE_HEIGHT && mouseY > 0) {
+  //   background(c);
+  //   freq1 = random(randThresh);
+  //   freq2 = random(randThresh);
+
+    // oscillator1.frequency.value = map(freq1, 0, 100, lowThresh, highThresh); 
+    // oscillator2.frequency.value = map(freq2, 0, 100, lowThresh, highThresh); 
   }
-}
 
 document.body.onkeydown=function(e){
   if(e.keyCode == 38 && freq1 < 100) { 
@@ -148,23 +210,38 @@ document.body.onkeydown=function(e){
         freq2 = random(.5, 2);
     }
       
-    console.log(e.keyCode);      
-    console.log(freq1 + " " + freq2);
+    // oscillator1.frequency.value = map(freq1, 0, 100, lowThresh, highThresh); 
+    // oscillator2.frequency.value = map(freq2, 0, 100, lowThresh, highThresh); 
+
+    // console.log(e.keyCode);      
+    // console.log(freq1 + " " + freq2);
 }    
 
-function saveFreqs() {
-    var freqObj = new FreqObj();
 
-    freqObj.set("freq1", freq1);
-    freqObj.set("freq2", freq2);
-     
-    freqObj.save(null, {
-      success: function(freqObj) {
-      },
-      error: function(freqObj, error) {
-      }
-    });
-  }
+// ************************************ //
+// ****** SAVE TO PARSE DATABASE ****** //
+// ************************************ //
+
+function saveFreqs() {
+  var imgCap  = cnv.elt.toDataURL("image/png");
+  var freqObj = new FreqObj();
+
+  var file = new Parse.File("imgCap.png", { base64: imgCap });
+  file.save().then(function() {
+      freqObj.set("freq1", freq1);
+      freqObj.set("freq2", freq2);
+      freqObj.set("imgCap", file);
+      freqObj.save(null, {
+        success: function(freqObj) {
+        },
+        error: function(freqObj, error) {
+        }
+      });
+    }, function(error) {
+    // The file either could not be read, or could not be saved to Parse.
+  });
+}
+   
 
 function loadFreqs() {
   var query = new Parse.Query(FreqObj);
@@ -173,7 +250,7 @@ function loadFreqs() {
     success: function(results) {
       for (var i = 0; i < results.length; i++) { 
         var object = results[i];
-        console.log(object.get("freq1") + " & " + object.get("freq2"));
+        console.log(object.get("freq1") + " & " + object.get("freq2") + " & " + object.get("imgCap"));
       }
     },
     error: function(error) {

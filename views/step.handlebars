@@ -12,7 +12,7 @@
 Parse.initialize("eWPNe3TUXgWFSwB0K7RBT5K6JoGZCNQezY65xWEh", "D5282Li25JM10WBARFrT5uPMxxPFtL6mwGM2zU1v");
 
 // create the parse class
-var FreqObj = Parse.Object.extend("Freqs");
+var FreqObj = Parse.Object.extend("OscArt");
 var SavedFreqObj = Parse.Object.extend("SavedFreqs");
 // declare global variables
 var angle = 0;
@@ -60,6 +60,8 @@ function setup() {
   cnv = createCanvas(window.innerWidth, WAVE_HEIGHT + BUTTON_DIV);
   freq1 = round(random(randThresh));
   freq2 = round(random(randThresh2));
+
+  var imgCap  = cnv.elt.toDataURL("image/png");
 
   background(c);
   strokeWeight(3);
@@ -114,19 +116,22 @@ function button() {
 function mouseReleased() {
   if (mouseX > width/2-BUTTON_SIZE_X/2 && mouseX < width/2+BUTTON_SIZE_X/2) {
     if (mouseY > WAVE_HEIGHT+50-BUTTON_SIZE_Y/2 && mouseY < WAVE_HEIGHT+50+BUTTON_SIZE_Y/2) {
-        saveFreqs();
-        loadFreqs();
-        console.log("Freqs saved: " +freq1+ " & " +freq2);
+      var imgCap  = cnv.elt.toDataURL("image/png");
+      saveFreqs();
+      loadFreqs();
+      console.log("Freqs saved: " +freq1+ " / " +freq2+ " & Image saved: " +imgCap);
+
+      // var imgDisplay = createHTML('<img src="'+imgCap+'" width="window.innerWidth"/> ');
     }
   }
 }
 
 function mousePressed() {
-  if ( mouseY < WAVE_HEIGHT && mouseY > 0) {
-    background(c);
-    freq1 = round(random(randThresh));
-    freq2 = round(random(randThresh2));
-  }
+  // if ( mouseY < WAVE_HEIGHT && mouseY > 0) {
+  //   background(c);
+  //   freq1 = round(random(randThresh));
+  //   freq2 = round(random(randThresh2));
+  // }
 }
 
 document.body.onkeydown=function(e){
@@ -162,18 +167,24 @@ document.body.onkeydown=function(e){
 }     
 
 function saveFreqs() {
-    var freqObj = new FreqObj();
+  var imgCap  = cnv.elt.toDataURL("image/png");
+  var freqObj = new FreqObj();
 
-    freqObj.set("freq1", freq1);
-    freqObj.set("freq2", freq2);
-     
-    freqObj.save(null, {
-      success: function(freqObj) {
-      },
-      error: function(freqObj, error) {
-      }
-    });
-  }
+  var file = new Parse.File("imgCap.png", { base64: imgCap });
+  file.save().then(function() {
+      freqObj.set("freq1", freq1);
+      freqObj.set("freq2", freq2);
+      freqObj.set("imgCap", file);
+      freqObj.save(null, {
+        success: function(freqObj) {
+        },
+        error: function(freqObj, error) {
+        }
+      });
+    }, function(error) {
+    // The file either could not be read, or could not be saved to Parse.
+  });
+}
 
 function loadFreqs() {
   var query = new Parse.Query(FreqObj);
@@ -182,7 +193,7 @@ function loadFreqs() {
     success: function(results) {
       for (var i = 0; i < results.length; i++) { 
         var object = results[i];
-        console.log(object.get("freq1") + " & " + object.get("freq2"));
+        console.log(object.get("freq1") + " & " + object.get("freq2") + " & " + object.get("imgCap"));
       }
     },
     error: function(error) {

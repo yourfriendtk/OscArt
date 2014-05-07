@@ -10,14 +10,14 @@
 Parse.initialize("eWPNe3TUXgWFSwB0K7RBT5K6JoGZCNQezY65xWEh", "D5282Li25JM10WBARFrT5uPMxxPFtL6mwGM2zU1v");
 
 var imgSizeX = window.innerWidth;
-var imgSizeY = 375; //or imgSizeX*0.2;
+var imgSizeY = 345; //or imgSizeX*0.2;
 var imgFirstMargin = 155;
 var imgMargin = 50;
 
 var imgDiv = [];
 
 // create the parse class
-var FreqObj = Parse.Object.extend("Freqs");
+var FreqObj = Parse.Object.extend("OscArt");
 var SavedFreqObj = Parse.Object.extend("SavedFreqs");
 
 function saveFreqs(f1, f2) {
@@ -35,6 +35,9 @@ function saveFreqs(f1, f2) {
 	});
  };
 
+// var link = createHTML('<img src="'+img+'" width="200"/> ');
+// <a href='/sine'>" + object.get("freq1") + " / " + object.get("freq2") + "</a>
+
 function loadFreqs() {
   var query = new Parse.Query(FreqObj);
   query.exists("freq1");
@@ -45,17 +48,16 @@ function loadFreqs() {
         var object = results[i];
         //console.log(object.get("freq1") + " & " + object.get("freq2"));
         //imgDiv[i] = createHTMLImage("/public/images/OscillatorArt_01.png");
-        imgDiv[i] = createHTML("<div><a href='/sine'>" +
-        	object.get("freq1") + " / " + object.get("freq2")
-        	+ "</a></div>");
+        imgDiv[i] = createHTML('<div><img src="'+object.get("imgCap").url()+'" width="'+ imgSizeX + '"/></div>');
         imgDiv[i].position(0, imgFirstMargin+ imgSizeY*i + imgMargin*i);
-        imgDiv[i].style('width:' +imgSizeX+ 'px; height:' +imgSizeY+ 'px; padding:20px');
+        imgDiv[i].style('width:' +imgSizeX+ 'px; height:' +imgSizeY+ 'px;');
         if (i%2 == 0) imgDiv[i].style('background-color: #EEE;');
         else imgDiv[i].style('background-color: #CCC;');
         imgDiv[i].id("imgDiv");
         
         imgDiv[i].freq1 = object.get("freq1");
         imgDiv[i].freq2 = object.get("freq2");
+        imgDiv[i].imgCap = object.get("imgCap");
       }
     },
     error: function(error) {
